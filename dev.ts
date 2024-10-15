@@ -1,29 +1,15 @@
-import { App, AppItemType, type AppEndpoint } from './src/app.ts';
+import { App } from './src/app.ts';
+import { Server } from './src/server.ts';
 
-const app = new App().route('GET', '/', () => 'hello world').app('/users', new App());
+const app = new App().get('/', () => 'hello world').get('/ping', () => console.log('ping'));
+
+const server = new Server([app]);
 
 Deno.serve({
   port: 8000,
-  handler: async (req) => {
-    const pathname = new URL(req.url).pathname;
-    const method = req.method;
+  handler: server.getHandler(),
+});
 
-    const endpoint = app.items.find(
-      (item) => item.type === AppItemType.Endpoint && item.path === pathname && item.method === method
-    ) as AppEndpoint | undefined;
-
-    if (!endpoint) {
-      return new Response('not found', { status: 404 });
-    }
-
-    let html = undefined;
-
-    for (const handler of endpoint.handlers) {
-      html = await handler(req);
-    }
-
-    console.log(html);
-
-    return new Response(JSON.stringify(html), { status: 200, headers: { 'content-type': 'application/json' } });
-  },
+server.routes.forEach((endpoint) => {
+  console.log(`${endpoint.method.padEnd(5)} ${endpoint.path}`);
 });

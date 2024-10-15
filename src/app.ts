@@ -1,4 +1,4 @@
-import { RawHandler, type Method } from './types.ts';
+import { RawHandler, type Method } from './types/types.ts';
 
 export class App {
   prefix: string = '';

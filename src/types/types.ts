@@ -1,6 +1,4 @@
-import type { StringWithAutoComplete } from './helpers.ts';
-
-export type Asyncable<T = void> = T | Promise<T>;
+import type { Asyncable, StringWithAutoComplete } from './helpers.ts';
 
 export type RawHandler<T = unknown> = (req: Request) => Asyncable<T>;
 
