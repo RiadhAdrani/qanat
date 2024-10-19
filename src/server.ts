@@ -1,28 +1,39 @@
 import { AppItemType, type App } from './app.ts';
-import { resolvePath, resolveSegments } from './helpers/functions.ts';
-import type { Method, RawHandler } from './types/types.ts';
+import { Context } from './context.ts';
+import { AppError } from './error.ts';
+import { chainMiddleware, resolvePath, resolveSegments } from './helpers/functions.ts';
+import type { Method, MiddlewareHandler, ResponseData, ResponseOptions, RouteHandler } from './types/types.ts';
+import { ResponseType } from './types/types.ts';
 
 export class Server {
   routes: Array<ServerEndpoint> = [];
 
   constructor(apps: Array<App>) {
-    apps.forEach((app) =>
-      app.items.forEach((item) => {
-        if (item.type === AppItemType.App) {
-          throw new Error('not implemented');
-        }
+    apps.forEach((app) => this.extractRoutes('', app, []));
+  }
 
-        const path = resolvePath([app.prefix, item.path]);
-        const segments = resolveSegments(path);
+  extractRoutes(prefix: string, app: App, previousMiddlewares: Array<MiddlewareHandler>) {
+    // middlewares
 
-        this.routes.push({
-          method: item.method,
-          path,
-          segments,
-          handlers: item.handlers,
-        });
-      })
-    );
+    const middlewares = [...previousMiddlewares, ...app.middlewares];
+
+    app.items.forEach((it) => {
+      if (it.type === AppItemType.App) {
+        return this.extractRoutes(`${prefix}/${it.prefix}`, it.app, middlewares);
+      }
+
+      const path = resolvePath([prefix, app.prefix, it.path]);
+      const segments = resolveSegments(path);
+
+      const handler = chainMiddleware(it.handler, middlewares);
+
+      this.routes.push({
+        method: it.method,
+        path,
+        segments,
+        handler,
+      });
+    });
   }
 
   findRoute(req: Request): ServerEndpoint | undefined {
@@ -33,34 +44,62 @@ export class Server {
     const method = req.method;
     const path = new URL(req.url).pathname;
 
+    // TODO: find dynamic endpoint
     return this.routes.find((endpoint) => endpoint.method === method && endpoint.path === path);
   }
 
-  getHandler() {
-    // deno-lint-ignore no-this-alias
-    const server = this;
+  async handler(req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>) {
+    let response: unknown;
+    let options: ResponseOptions = { status: 200 };
+    let type: ResponseType = ResponseType.Json;
 
-    return async (req: Request) => {
-      try {
-        const route = server.findRoute(req);
+    try {
+      const responseData = await new Promise<ResponseData>((resolve, reject) => {
+        const route = this.findRoute(req);
 
         if (!route) {
-          return new Response('not found', { status: 404 });
+          return reject(new AppError({ message: 'not found', status: 404 }));
         }
 
-        let data: unknown = undefined;
+        const ctx = new Context(req, info, resolve);
 
-        for (const fn of route.handlers) {
-          data = await fn(req);
-        }
+        route.handler(ctx);
+      });
 
-        return new Response(JSON.stringify(data), { status: 200 });
-      } catch (error) {
-        console.error(error);
+      response = responseData.data;
+      options = responseData.options;
+      type = responseData.type;
+    } catch (error) {
+      type = ResponseType.Json;
 
-        return new Response('internal server error', { status: 500 });
+      if (error instanceof AppError) {
+        response = error.message;
+        options = { status: error.status };
+      } else {
+        response = 'internal server error';
+        options = { status: 500 };
       }
-    };
+    }
+
+    let value: BodyInit;
+
+    switch (type) {
+      case ResponseType.Json: {
+        value = JSON.stringify(response);
+        break;
+      }
+      case ResponseType.Text: {
+        value = String(response);
+        break;
+      }
+      default: {
+        value = 'response type no implemented';
+        options = { status: 500 };
+        break;
+      }
+    }
+
+    return new Response(value, options);
   }
 }
 
@@ -68,5 +107,5 @@ export type ServerEndpoint = {
   method: Method;
   path: string;
   segments: Array<string>;
-  handlers: Array<RawHandler>;
+  handler: RouteHandler;
 };

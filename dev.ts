@@ -1,13 +1,22 @@
 import { App } from './src/app.ts';
 import { Server } from './src/server.ts';
 
-const app = new App().get('/', () => 'hello world').get('/ping', () => console.log('ping'));
+const app = new App()
+  .middleware(async (_ctx, next) => {
+    console.log('start middleware 1');
+    await next();
+    console.log('end middleware 1');
+  })
+  .get('/', (ctx) => {
+    console.log('/hello world');
+    ctx.json('hello world', {});
+  });
 
 const server = new Server([app]);
 
 Deno.serve({
   port: 8000,
-  handler: server.getHandler(),
+  handler: (req, info) => server.handler(req, info),
 });
 
 server.routes.forEach((endpoint) => {

@@ -1,15 +1,17 @@
-import { RawHandler, type Method } from './types/types.ts';
+import type { ContextData } from './context.ts';
+import { type Method, type MiddlewareHandler, type RouteHandler } from './types/types.ts';
 
-export class App {
+export class App<T extends ContextData = ContextData> {
   prefix: string = '';
-  items: Array<AppItem> = [];
-  middlewares: Array<unknown> = [];
+  items: Array<AppItem<T>> = [];
+  middlewares: Array<MiddlewareHandler<T>> = [];
 
   constructor(prefix = '') {
     this.prefix = prefix;
   }
 
-  middleware() {
+  middleware(handler: MiddlewareHandler<T>) {
+    this.middlewares.push(handler);
     return this;
   }
 
@@ -17,52 +19,52 @@ export class App {
     return this;
   }
 
-  app(prefix: string, app: App): App {
+  app(prefix: string, app: App) {
     this.items.push({ app, prefix, type: AppItemType.App });
 
     return this;
   }
 
-  route(method: Method, path: string, ...handlers: Array<RawHandler>) {
-    this.items.push({ method, path, handlers, type: AppItemType.Endpoint });
+  route(method: Method, path: string, handler: RouteHandler<T>) {
+    this.items.push({ method, path, handler, type: AppItemType.Endpoint });
 
     return this;
   }
 
-  get(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('GET', path, ...handlers);
+  get(path: string, handler: RouteHandler<T>) {
+    return this.route('GET', path, handler);
   }
 
-  post(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('POST', path, ...handlers);
+  post(path: string, handler: RouteHandler<T>) {
+    return this.route('POST', path, handler);
   }
 
-  patch(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('PATCH', path, ...handlers);
+  patch(path: string, handler: RouteHandler<T>) {
+    return this.route('PATCH', path, handler);
   }
 
-  put(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('PUT', path, ...handlers);
+  put(path: string, handler: RouteHandler<T>) {
+    return this.route('PUT', path, handler);
   }
 
-  delete(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('DELETE', path, ...handlers);
+  delete(path: string, handler: RouteHandler<T>) {
+    return this.route('DELETE', path, handler);
   }
 
-  options(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('OPTIONS', path, ...handlers);
+  options(path: string, handler: RouteHandler<T>) {
+    return this.route('OPTIONS', path, handler);
   }
 
-  head(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('HEAD', path, ...handlers);
+  head(path: string, handler: RouteHandler<T>) {
+    return this.route('HEAD', path, handler);
   }
 
-  trace(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('TRACE', path, ...handlers);
+  trace(path: string, handler: RouteHandler<T>) {
+    return this.route('TRACE', path, handler);
   }
 
-  connect(path: string, ...handlers: Array<RawHandler>): App {
-    return this.route('CONNECT', path, ...handlers);
+  connect(path: string, handler: RouteHandler<T>) {
+    return this.route('CONNECT', path, handler);
   }
 }
 
@@ -75,10 +77,10 @@ export type AppItemBase<T extends AppItemType> = {
   type: T;
 };
 
-export interface AppEndpoint extends AppItemBase<typeof AppItemType.Endpoint> {
+export interface AppEndpoint<T extends ContextData = ContextData> extends AppItemBase<typeof AppItemType.Endpoint> {
   method: string;
   path: string;
-  handlers: Array<RawHandler>;
+  handler: RouteHandler<T>;
 }
 
 export interface SubApp extends AppItemBase<typeof AppItemType.App> {
@@ -86,4 +88,4 @@ export interface SubApp extends AppItemBase<typeof AppItemType.App> {
   app: App;
 }
 
-export type AppItem = AppEndpoint | SubApp;
+export type AppItem<T extends ContextData = ContextData> = AppEndpoint<T> | SubApp;
