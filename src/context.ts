@@ -1,21 +1,27 @@
+import type { RouteParameters } from './types/types.ts';
 import { ResponseType, type HandlerRequestInfo, type ResponseData, type ResponseOptions } from './types/types.ts';
 
 export type RequestResolve = (data: ResponseData) => void;
 
 export type ContextData = Record<string, unknown>;
 
+export type ContextInputData = {
+  params: RouteParameters;
+};
+
 export class Context<T extends ContextData = ContextData> {
   request: Request;
   info: HandlerRequestInfo;
+  params: RouteParameters = {};
 
-  data: T = {} as T;
-  fullfiled: boolean = false;
-
+  private fullfiled: boolean = false;
+  private data: T = {} as T;
   private resolve: RequestResolve;
 
-  constructor(request: Request, info: HandlerRequestInfo, resolve: RequestResolve) {
+  constructor(request: Request, info: HandlerRequestInfo, resolve: RequestResolve, inputData: ContextInputData) {
     this.request = request;
     this.info = info;
+    this.params = inputData.params;
 
     this.resolve = (response) => {
       if (this.fullfiled) {
@@ -29,6 +35,10 @@ export class Context<T extends ContextData = ContextData> {
 
   get(key: keyof T): T[keyof T] {
     return this.data[key];
+  }
+
+  set(key: keyof T, value: T[keyof T]) {
+    this.data[key] = value;
   }
 
   send(data: unknown, options: ResponseOptions, type: ResponseType = ResponseType.Json) {

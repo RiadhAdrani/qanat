@@ -1,5 +1,11 @@
 import { resolveSegments } from '../helpers/functions.ts';
-import type { Method, RouteHandler } from '../types/types.ts';
+import type { Method, RouteHandler, RouteParameters } from '../types/types.ts';
+
+export type FindTrieResult = {
+  method: Method;
+  handler: RouteHandler;
+  params: RouteParameters;
+};
 
 export class Trie {
   root: TrieNode = new TrieNode('');
@@ -29,10 +35,12 @@ export class Trie {
     }
   }
 
-  find(method: Method, path: string) {
+  find(method: Method, path: string): FindTrieResult | undefined {
     const segments = resolveSegments(path);
 
     let node: TrieNode | undefined;
+
+    const params: Record<string, string | undefined> = {};
 
     if (segments.length === 1) {
       node = this.root;
@@ -46,6 +54,9 @@ export class Trie {
           const result = current.nodes.entries().find(([_key, node]) => node.isDynamic);
 
           if (result) {
+            const key = result[0].slice(1);
+            params[key] = segments[i];
+
             targetNode = result[1];
           }
         }
@@ -66,7 +77,11 @@ export class Trie {
 
     const handler = node.findMethod(method);
 
-    return handler;
+    if (!handler) {
+      return undefined;
+    }
+
+    return { method: handler.method, handler: handler.handler, params };
   }
 }
 

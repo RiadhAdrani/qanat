@@ -2,6 +2,8 @@ import type { Context, ContextData } from '../context.ts';
 import type { Asyncable, StringWithAutoComplete } from './helpers.ts';
 import { HTTP_METHODS } from '../values.ts';
 
+export type RouteParameters = Record<string, string | undefined>;
+
 export type HandlerRequestInfo = Deno.ServeHandlerInfo<Deno.NetAddr>;
 
 export type RawHandler<T = unknown> = (req: Request, info: HandlerRequestInfo) => Asyncable<T>;

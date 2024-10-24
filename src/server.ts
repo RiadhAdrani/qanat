@@ -45,7 +45,9 @@ export class Server {
           return reject(new AppError({ message: 'not found', status: 404 }));
         }
 
-        const ctx = new Context(req, info, resolve);
+        const input = { params: route.params };
+
+        const ctx = new Context(req, info, resolve, input);
 
         route.handler(ctx);
       });

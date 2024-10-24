@@ -8,14 +8,16 @@ const app = new App()
     console.log('end middleware 1');
   })
   .get('/', (ctx) => ctx.text('GET /', {}))
-  .post('/', (ctx) => ctx.text('POST /', {}))
   .app(
-    '/api',
+    '/:api',
     new App()
-      .get('/', (ctx) => ctx.text('GET /api', {}))
-      .post('/', (ctx) => ctx.text('POST /api', {}))
-      .put('/', (ctx) => ctx.text('PUT /api', {}))
-      .get('/users', (ctx) => ctx.text('GET /api/users', {}))
+      .middleware(async (_ctx, next) => {
+        console.log('start api middleware ');
+        console.log(_ctx.params);
+        await next();
+        console.log('end api middleware ');
+      })
+      .get('/', (ctx) => ctx.text('GET: This is the api', {}))
   );
 
 const server = new Server([app]);
