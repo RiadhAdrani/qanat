@@ -1,5 +1,6 @@
 import type { Context, ContextData } from '../context.ts';
 import type { Asyncable, StringWithAutoComplete } from './helpers.ts';
+import { HTTP_METHODS } from '../values.ts';
 
 export type HandlerRequestInfo = Deno.ServeHandlerInfo<Deno.NetAddr>;
 
@@ -14,7 +15,7 @@ export type MiddlewareHandler<T extends ContextData = ContextData> = (
 
 export type ErrorHandler = (err: Error, req: Request) => Asyncable<unknown>;
 
-export type KnownMethods = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD' | 'TRACE' | 'CONNECT';
+export type KnownMethods = (typeof HTTP_METHODS)[keyof typeof HTTP_METHODS];
 
 export type Method = StringWithAutoComplete<KnownMethods>;
 

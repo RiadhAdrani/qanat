@@ -1,4 +1,5 @@
 import { AppItemType, type App } from './app.ts';
+import { Trie } from './classes/trie.ts';
 import { Context } from './context.ts';
 import { AppError } from './error.ts';
 import { chainMiddleware, resolvePath, resolveSegments } from './helpers/functions.ts';
@@ -6,15 +7,13 @@ import type { Method, MiddlewareHandler, ResponseData, ResponseOptions, RouteHan
 import { ResponseType } from './types/types.ts';
 
 export class Server {
-  routes: Array<ServerEndpoint> = [];
+  trie: Trie = new Trie();
 
   constructor(apps: Array<App>) {
     apps.forEach((app) => this.extractRoutes('', app, []));
   }
 
   extractRoutes(prefix: string, app: App, previousMiddlewares: Array<MiddlewareHandler>) {
-    // middlewares
-
     const middlewares = [...previousMiddlewares, ...app.middlewares];
 
     app.items.forEach((it) => {
@@ -27,25 +26,8 @@ export class Server {
 
       const handler = chainMiddleware(it.handler, middlewares);
 
-      this.routes.push({
-        method: it.method,
-        path,
-        segments,
-        handler,
-      });
+      this.trie.add(it.method, segments, handler);
     });
-  }
-
-  findRoute(req: Request): ServerEndpoint | undefined {
-    if (this.routes.length === 0) {
-      return undefined;
-    }
-
-    const method = req.method;
-    const path = new URL(req.url).pathname;
-
-    // TODO: find dynamic endpoint
-    return this.routes.find((endpoint) => endpoint.method === method && endpoint.path === path);
   }
 
   async handler(req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>) {
@@ -55,7 +37,9 @@ export class Server {
 
     try {
       const responseData = await new Promise<ResponseData>((resolve, reject) => {
-        const route = this.findRoute(req);
+        const path = new URL(req.url).pathname;
+
+        const route = this.trie.find(req.method, path);
 
         if (!route) {
           return reject(new AppError({ message: 'not found', status: 404 }));

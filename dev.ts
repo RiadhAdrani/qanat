@@ -7,10 +7,16 @@ const app = new App()
     await next();
     console.log('end middleware 1');
   })
-  .get('/', (ctx) => {
-    console.log('/hello world');
-    ctx.json('hello world', {});
-  });
+  .get('/', (ctx) => ctx.text('GET /', {}))
+  .post('/', (ctx) => ctx.text('POST /', {}))
+  .app(
+    '/api',
+    new App()
+      .get('/', (ctx) => ctx.text('GET /api', {}))
+      .post('/', (ctx) => ctx.text('POST /api', {}))
+      .put('/', (ctx) => ctx.text('PUT /api', {}))
+      .get('/users', (ctx) => ctx.text('GET /api/users', {}))
+  );
 
 const server = new Server([app]);
 
@@ -19,6 +25,4 @@ Deno.serve({
   handler: (req, info) => server.handler(req, info),
 });
 
-server.routes.forEach((endpoint) => {
-  console.log(`${endpoint.method.padEnd(5)} ${endpoint.path}`);
-});
+server.trie.root.print();

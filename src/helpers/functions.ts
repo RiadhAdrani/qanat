@@ -1,5 +1,5 @@
 import type { Context } from '../context.ts';
-import type { HandlerRequestInfo, RawHandler, MiddlewareHandler, RouteHandler } from '../types/types.ts';
+import type { MiddlewareHandler, RouteHandler } from '../types/types.ts';
 
 export const resolvePath = (items: Array<string>): string => {
   // replace successive leading slashes
@@ -7,7 +7,7 @@ export const resolvePath = (items: Array<string>): string => {
 };
 
 export const resolveSegments = (path: string) => {
-  return path.split('/').filter(Boolean);
+  return ['', ...path.split('/').filter(Boolean)];
 };
 
 export const chainMiddleware = (handler: RouteHandler, middlewares: Array<MiddlewareHandler>): RouteHandler => {

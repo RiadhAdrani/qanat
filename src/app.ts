@@ -1,5 +1,6 @@
 import type { ContextData } from './context.ts';
 import { type Method, type MiddlewareHandler, type RouteHandler } from './types/types.ts';
+import { HTTP_METHODS } from './values.ts';
 
 export class App<T extends ContextData = ContextData> {
   prefix: string = '';
@@ -32,39 +33,39 @@ export class App<T extends ContextData = ContextData> {
   }
 
   get(path: string, handler: RouteHandler<T>) {
-    return this.route('GET', path, handler);
+    return this.route(HTTP_METHODS.GET, path, handler);
   }
 
   post(path: string, handler: RouteHandler<T>) {
-    return this.route('POST', path, handler);
+    return this.route(HTTP_METHODS.POST, path, handler);
   }
 
   patch(path: string, handler: RouteHandler<T>) {
-    return this.route('PATCH', path, handler);
+    return this.route(HTTP_METHODS.PATCH, path, handler);
   }
 
   put(path: string, handler: RouteHandler<T>) {
-    return this.route('PUT', path, handler);
+    return this.route(HTTP_METHODS.PUT, path, handler);
   }
 
   delete(path: string, handler: RouteHandler<T>) {
-    return this.route('DELETE', path, handler);
+    return this.route(HTTP_METHODS.DELETE, path, handler);
   }
 
   options(path: string, handler: RouteHandler<T>) {
-    return this.route('OPTIONS', path, handler);
+    return this.route(HTTP_METHODS.OPTIONS, path, handler);
   }
 
   head(path: string, handler: RouteHandler<T>) {
-    return this.route('HEAD', path, handler);
+    return this.route(HTTP_METHODS.HEAD, path, handler);
   }
 
   trace(path: string, handler: RouteHandler<T>) {
-    return this.route('TRACE', path, handler);
+    return this.route(HTTP_METHODS.TRACE, path, handler);
   }
 
   connect(path: string, handler: RouteHandler<T>) {
-    return this.route('CONNECT', path, handler);
+    return this.route(HTTP_METHODS.CONNECT, path, handler);
   }
 }
 

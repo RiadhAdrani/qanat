@@ -35,31 +35,31 @@ export class Context<T extends ContextData = ContextData> {
     this.resolve({ data, options, type });
   }
 
-  json(data: unknown, options: ResponseOptions) {
+  json(data: unknown, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Json);
   }
 
-  text(data: string, options: ResponseOptions) {
+  text(data: string, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Text);
   }
 
-  blob(data: Blob, options: ResponseOptions) {
+  blob(data: Blob, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Blob);
   }
 
-  buffer(data: ArrayBuffer, options: ResponseOptions) {
+  buffer(data: ArrayBuffer, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Buffer);
   }
 
-  formData(data: FormData, options: ResponseOptions) {
+  formData(data: FormData, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.FormData);
   }
 
-  urlSearchParams(data: URLSearchParams, options: ResponseOptions) {
+  urlSearchParams(data: URLSearchParams, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.UrlSearchParams);
   }
 
-  stream(data: ReadableStream, options: ResponseOptions) {
+  stream(data: ReadableStream, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Stream);
   }
 }
