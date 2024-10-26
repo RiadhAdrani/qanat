@@ -2,6 +2,7 @@ import { resolveSegments } from '../helpers/functions.ts';
 import type { Method, RouteHandler, RouteParameters } from '../types/types.ts';
 
 export type FindTrieResult = {
+  trie: TrieNode;
   method: Method;
   handler: RouteHandler;
   params: RouteParameters;
@@ -81,7 +82,7 @@ export class Trie {
       return undefined;
     }
 
-    return { method: handler.method, handler: handler.handler, params };
+    return { method: handler.method, handler: handler.handler, params, trie: node };
   }
 }
 

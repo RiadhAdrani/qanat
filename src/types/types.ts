@@ -23,6 +23,11 @@ export type Method = StringWithAutoComplete<KnownMethods>;
 
 export type ResponseOptions = ResponseInit;
 
+export type RedirectResponseOptions = {
+  url: string | URL;
+  status?: number;
+};
+
 export enum ResponseType {
   Json,
   Text,
@@ -31,6 +36,7 @@ export enum ResponseType {
   FormData,
   UrlSearchParams,
   Stream,
+  Redirection,
 }
 
 export type ResponseData = {

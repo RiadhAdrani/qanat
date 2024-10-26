@@ -8,6 +8,7 @@ const app = new App()
     console.log('end middleware 1');
   })
   .get('/', (ctx) => ctx.text('GET /', {}))
+  .get('/google', (ctx) => ctx.redirect('https://google.com'))
   .app(
     '/:api',
     new App()
@@ -17,7 +18,7 @@ const app = new App()
         await next();
         console.log('end api middleware ');
       })
-      .get('/', (ctx) => ctx.text('GET: This is the api', {}))
+      .get('/:another-one', (ctx) => ctx.text('GET: This is the api', {}))
   );
 
 const server = new Server([app]);

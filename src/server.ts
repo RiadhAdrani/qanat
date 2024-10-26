@@ -39,17 +39,15 @@ export class Server {
       const responseData = await new Promise<ResponseData>((resolve, reject) => {
         const path = new URL(req.url).pathname;
 
-        const route = this.trie.find(req.method, path);
+        const result = this.trie.find(req.method, path);
 
-        if (!route) {
+        if (!result) {
           return reject(new AppError({ message: 'not found', status: 404 }));
         }
 
-        const input = { params: route.params };
+        const ctx = new Context(req, info, resolve, result);
 
-        const ctx = new Context(req, info, resolve, input);
-
-        route.handler(ctx);
+        result.handler(ctx);
       });
 
       response = responseData.data;
@@ -76,6 +74,14 @@ export class Server {
       }
       case ResponseType.Text: {
         value = String(response);
+        break;
+      }
+      case ResponseType.Redirection: {
+        value = '';
+        options.headers = {
+          ...options.headers,
+          Location: String(response),
+        };
         break;
       }
       default: {
