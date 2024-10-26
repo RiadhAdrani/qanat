@@ -79,11 +79,19 @@ export class Server {
       case ResponseType.Redirection: {
         value = '';
         options.headers = {
-          ...options.headers,
           Location: String(response),
+          ...options.headers,
         };
         break;
       }
+      case ResponseType.Blob: {
+        value = response as Blob;
+        break;
+      }
+      case ResponseType.Buffer:
+      case ResponseType.FormData:
+      case ResponseType.UrlSearchParams:
+      case ResponseType.Stream:
       default: {
         value = 'response type no implemented';
         options = { status: 500 };

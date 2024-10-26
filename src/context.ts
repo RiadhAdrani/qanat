@@ -60,7 +60,7 @@ export class Context<T extends ContextData = ContextData> {
     this.send(data, options, ResponseType.Text);
   }
 
-  blob(data: Blob, options: ResponseOptions = {}) {
+  blob(data: Blob | Uint16Array | Uint8Array, options: ResponseOptions = {}) {
     this.send(data, options, ResponseType.Blob);
   }
 
