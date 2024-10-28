@@ -1,6 +1,6 @@
-import type { ContextData } from './context.ts';
-import { type Method, type MiddlewareHandler, type RouteHandler } from '../types/mod.ts';
 import HTTP_METHODS from '../constants/http-mthods.ts';
+import { type Method, type MiddlewareHandler, type RouteHandler } from '../types/mod.ts';
+import type { ContextData } from './context.ts';
 
 export class App<T extends ContextData = ContextData> {
   prefix: string = '';
@@ -13,10 +13,6 @@ export class App<T extends ContextData = ContextData> {
 
   middleware(handler: MiddlewareHandler<T>) {
     this.middlewares.push(handler);
-    return this;
-  }
-
-  error() {
     return this;
   }
 

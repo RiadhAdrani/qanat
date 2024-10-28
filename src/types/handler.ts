@@ -7,4 +7,4 @@ export type RawHandler<T = unknown> = (req: Request, info: HandlerRequestInfo) =
 
 export type RouteHandler<T extends ContextData = ContextData> = (ctx: Context<T>) => Asyncable<void>;
 
-export type ErrorHandler = (err: Error, req: Request) => Asyncable<unknown>;
+export type ErrorHandler = (err: unknown, ctx: Context) => Asyncable<unknown>;

@@ -2,14 +2,24 @@ import { App, Server } from './src/classes/mod.ts';
 
 const app = new App()
   .middleware(async (ctx, next) => {
-    ctx.set('user', 'riadh');
+    try {
+      await next();
+    } catch (error) {
+      console.log(error);
 
-    await next();
+      ctx.send(
+        new Response(['<h1>Someting went wrong</h1>', `<p>${error}</p>`].join(''), {
+          status: 500,
+          headers: { 'Content-Type': 'text/html' },
+        })
+      );
+    }
   })
   .get('/ping', (ctx) => {
-    console.log(ctx.get('user'));
-
     ctx.send(new Response('hello world'));
+  })
+  .get('/error', () => {
+    throw new Error('error');
   });
 
 const server = new Server([app]);

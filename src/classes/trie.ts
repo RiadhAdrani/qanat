@@ -101,7 +101,6 @@ export class TrieNode {
   }
 
   addNode(key: string): TrieNode {
-    // check if key already exists
     if (this.nodes.has(key)) {
       return this.nodes.get(key)!;
     }
@@ -118,7 +117,11 @@ export class TrieNode {
   }
 
   findMethod(method: Method) {
-    return this.methods.get(method);
+    const result = this.methods.entries().find(([key]) => key.toUpperCase() === method.toUpperCase());
+
+    if (!result) return undefined;
+
+    return result[1];
   }
 
   print(previousSegments: Array<string> = []) {
