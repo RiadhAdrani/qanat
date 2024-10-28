@@ -1,14 +1,6 @@
-import type { Context } from '../context.ts';
-import type { MiddlewareHandler, RouteHandler } from '../types/types.ts';
-
-export const resolvePath = (items: Array<string>): string => {
-  // replace successive leading slashes
-  return items.join('/').replaceAll(/(\/)+/g, '/');
-};
-
-export const resolveSegments = (path: string) => {
-  return ['', ...path.split('/').filter(Boolean)];
-};
+import type { Context } from '../classes/mod.ts';
+import type { MiddlewareHandler } from '../types/middleware.ts';
+import type { RouteHandler } from '../types/mod.ts';
 
 export const chainMiddleware = (handler: RouteHandler, middlewares: Array<MiddlewareHandler>): RouteHandler => {
   let fn: RouteHandler = handler;

@@ -1,15 +1,3 @@
-export const HTTP_METHODS = {
-  GET: 'GET',
-  POST: 'POST',
-  PUT: 'PUT',
-  PATCH: 'PATCH',
-  DELETE: 'DELETE',
-  OPTIONS: 'OPTIONS',
-  HEAD: 'HEAD',
-  CONNECT: 'CONNECT',
-  TRACE: 'TRACE',
-} as const;
-
 export const STATUS_CODE = {
   Continue: 100,
   SwitchingProtocols: 101,

@@ -1,11 +1,13 @@
+import type { StatusCode } from '../constants/status-code.ts';
+
 export type ErrorData = {
-  status: number;
+  status: StatusCode;
   message: string;
   data?: unknown;
 };
 
 export class AppError extends Error {
-  status: number;
+  status: StatusCode;
   data?: unknown;
 
   constructor(data: ErrorData = { message: 'internal server error', status: 500 }) {

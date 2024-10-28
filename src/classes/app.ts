@@ -1,6 +1,6 @@
 import type { ContextData } from './context.ts';
-import { type Method, type MiddlewareHandler, type RouteHandler } from './types/types.ts';
-import { HTTP_METHODS } from './values.ts';
+import { type Method, type MiddlewareHandler, type RouteHandler } from '../types/mod.ts';
+import HTTP_METHODS from '../constants/http-mthods.ts';
 
 export class App<T extends ContextData = ContextData> {
   prefix: string = '';

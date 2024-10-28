@@ -1,5 +1,5 @@
-import { resolveSegments } from '../helpers/functions.ts';
-import type { Method, RouteHandler, RouteParameters } from '../types/types.ts';
+import { resolveSegments } from '../helpers/mod.ts';
+import type { Method, RouteHandler, RouteParameters } from '../types/mod.ts';
 
 export type FindTrieResult = {
   trie: TrieNode;

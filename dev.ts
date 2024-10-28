@@ -1,21 +1,16 @@
-import { App } from './src/app.ts';
-import { Server } from './src/server.ts';
+import { App, Server } from './src/classes/mod.ts';
 
 const app = new App()
-  .app(
-    '/redirect',
-    new App().get('/:id', (ctx) => ctx.redirect('https://google.com'))
-  )
-  .app(
-    '/files',
-    new App().get('/logo', async (ctx) => {
-      const path = `${import.meta.dirname}/data/riadh.png`;
+  .middleware(async (ctx, next) => {
+    ctx.set('user', 'riadh');
 
-      const file = await Deno.readFile(path);
+    await next();
+  })
+  .get('/ping', (ctx) => {
+    console.log(ctx.get('user'));
 
-      ctx.blob(file, { headers: { 'Content-Type': 'image/png' } });
-    })
-  );
+    ctx.send(new Response('hello world'));
+  });
 
 const server = new Server([app]);
 
