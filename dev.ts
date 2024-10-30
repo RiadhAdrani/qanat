@@ -1,4 +1,4 @@
-import { App, Server } from './src/classes/mod.ts';
+import { App, Server, Socket } from './src/classes/mod.ts';
 
 const app = new App()
   .middleware(async (ctx, next) => {
@@ -22,11 +22,21 @@ const app = new App()
     throw new Error('error');
   });
 
-const server = new Server([app]);
+const socket = new Socket('/ws').socket(
+  '/users/:id',
+  new Socket().onOpen((ctx, ev) => {
+    console.log(ev);
+    console.log(ctx.params);
+
+    ctx.send(JSON.stringify(ctx.params));
+  })
+);
+
+const server = new Server([app, socket]);
 
 Deno.serve({
   port: 8000,
   handler: (req, info) => server.handler(req, info),
 });
 
-server.trie.root.print();
+server.http.root.print();

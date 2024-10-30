@@ -1,2 +1,2 @@
-export * from './http-mthods.ts';
+export * from './http-methods.ts';
 export * from './status-code.ts';
