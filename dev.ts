@@ -24,12 +24,18 @@ const app = new App()
 
 const socket = new Socket('/ws').socket(
   '/users/:id',
-  new Socket().onOpen((ctx, ev) => {
-    console.log(ev);
-    console.log(ctx.params);
+  new Socket()
+    .onOpen((ctx, ev) => {
+      console.log(ev);
+      console.log(ctx.params);
 
-    ctx.send(JSON.stringify(ctx.params));
-  })
+      ctx.send(JSON.stringify(ctx.params));
+    })
+    .onMessage((ctx, ev) => {
+      console.log(ev);
+
+      ctx.send('replied');
+    })
 );
 
 const server = new Server([app, socket]);

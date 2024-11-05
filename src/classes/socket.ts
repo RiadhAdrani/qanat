@@ -17,6 +17,10 @@ export class Socket<T extends ContextData = ContextData> {
   onclose: Array<OnSocketCloseHandler> = [];
   onerror: Array<OnSocketErrorHandler> = [];
 
+  get hasHandler() {
+    return this.onopen.length > 0 || this.onmessage.length > 0 || this.onclose.length > 0 || this.onerror.length > 0;
+  }
+
   constructor(prefix = '') {
     this.prefix = prefix;
   }

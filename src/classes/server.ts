@@ -48,45 +48,47 @@ export class Server {
     const path = resolvePath([prefix, app.prefix]);
     const segments = resolveSegments(path);
 
-    const baseHandler: SocketHandler = (ctx: SocketContext) => {
-      if (app.onmessage.length > 0) {
-        ctx.socket.onmessage = async (ev) => {
-          for (const handler of app.onmessage) {
-            await handler(ctx, ev);
-          }
-        };
-      }
+    if (app.hasHandler) {
+      const baseHandler: SocketHandler = (ctx: SocketContext) => {
+        if (app.onmessage.length > 0) {
+          ctx.socket.onmessage = async (ev) => {
+            for (const handler of app.onmessage) {
+              await handler(ctx, ev);
+            }
+          };
+        }
 
-      if (app.onclose.length > 0) {
-        ctx.socket.onclose = async (ev) => {
-          for (const handler of app.onclose) {
-            await handler(ctx, ev);
-          }
-        };
-      }
+        if (app.onclose.length > 0) {
+          ctx.socket.onclose = async (ev) => {
+            for (const handler of app.onclose) {
+              await handler(ctx, ev);
+            }
+          };
+        }
 
-      if (app.onopen.length > 0) {
-        ctx.socket.onopen = async (ev) => {
-          for (const handler of app.onopen) {
-            await handler(ctx, ev);
-          }
-        };
-      }
+        if (app.onopen.length > 0) {
+          ctx.socket.onopen = async (ev) => {
+            for (const handler of app.onopen) {
+              await handler(ctx, ev);
+            }
+          };
+        }
 
-      if (app.onerror.length > 0) {
-        ctx.socket.onerror = async (ev) => {
-          for (const handler of app.onerror) {
-            await handler(ctx, ev);
-          }
-        };
-      }
-    };
+        if (app.onerror.length > 0) {
+          ctx.socket.onerror = async (ev) => {
+            for (const handler of app.onerror) {
+              await handler(ctx, ev);
+            }
+          };
+        }
+      };
 
-    // deno-lint-ignore ban-ts-comment
-    // @ts-ignore
-    const handler = chainMiddlewares<SocketHandler, SocketMiddlewareHandler, SocketContext>(baseHandler, middlewares);
+      // deno-lint-ignore ban-ts-comment
+      // @ts-ignore
+      const handler = chainMiddlewares<SocketHandler, SocketMiddlewareHandler, SocketContext>(baseHandler, middlewares);
 
-    this.socket.add(segments, handler);
+      this.socket.add(segments, handler);
+    }
 
     app.items.forEach((it) => {
       const subPath = resolvePath([path, it.prefix]);
